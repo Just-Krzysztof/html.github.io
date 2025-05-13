@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wszystkiego Najlepszego Wojtek!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px; /* Dodano padding dla mniejszych ekranów */
+            overflow: hidden; /* Zapobiega pojawianiu się pasków przewijania podczas animacji */
+        }
+
+        .perspective-container {
+            perspective: 1500px;
+        }
+
+        .card-container {
+            width: 320px; /* Zmniejszono szerokość dla lepszego dopasowania na mobilnych */
+            height: 480px; /* Zmniejszono wysokość */
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
+            cursor: pointer;
+            border-radius: 16px; /* Zaokrąglone rogi dla kontenera */
+        }
+
+        .card-container.open {
+            transform: rotateY(-180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .card-front {
+            background: linear-gradient(to bottom right, #6DD5FA, #2980B9);
+            color: white;
+        }
+
+        .card-front h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem; /* Zmniejszono dla lepszego dopasowania */
+            margin-bottom: 1rem;
+        }
+
+        .card-front p {
+            font-size: 1rem; /* Zmniejszono */
+        }
+
+        .card-inside {
+            background: #fff8e1; /* Jasny kremowy kolor wnętrza */
+            color: #333;
+            transform: rotateY(180deg);
+            overflow: hidden; /* Aby elementy nie wychodziły poza kartkę */
+        }
+
+        .card-inside h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 1.8rem; /* Zmniejszono */
+            color: #ff6f61; /* Koralowy kolor */
+            margin-bottom: 0.5rem; /* Zmniejszono margines */
+            line-height: 1.2;
+        }
+        .card-inside .name {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.8rem; /* Zmniejszono */
+            color: #e91e63; /* Różowy */
+            margin-top: 0.5rem; /* Zmniejszono margines */
+            margin-bottom: 1rem; /* Zmniejszono margines */
+        }
+
+        .candles-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Świeczki wyrównane do dołu */
+            margin-bottom: 1rem; /* Zmniejszono margines */
+            height: 80px; /* Ustalona wysokość kontenera świeczek */
+        }
+
+        .candle {
+            width: 12px; /* Zmniejszono szerokość świeczki */
+            height: 50px; /* Zmniejszono wysokość świeczki */
+            background-color: #f8b400; /* Żółty kolor świeczki */
+            margin: 0 4px; /* Zmniejszono margines */
+            border-radius: 3px 3px 0 0;
+            position: relative;
+            box-shadow: inset 0 -2px 2px rgba(0,0,0,0.1);
+        }
+
+        .flame {
+            width: 10px; /* Zmniejszono szerokość płomienia */
+            height: 18px; /* Zmniejszono wysokość płomienia */
+            background-color: #ff4500; /* Pomarańczowo-czerwony płomień */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Kształt płomienia */
+            position: absolute;
+            top: -15px; /* Dopasowano pozycję płomienia */
+            left: 50%;
+            transform: translateX(-50%);
+            animation: flicker 0.8s infinite alternate; /* Zmieniono czas animacji */
+            box-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500;
+        }
+        
+        /* Różne wysokości świeczek dla naturalnego wyglądu */
+        .candle:nth-child(2n) { height: 45px; }
+        .candle:nth-child(3n) { height: 55px; }
+        .candle:nth-child(4n) { height: 40px; }
+
+
+        @keyframes flicker {
+            0% {
+                transform: translateX(-50%) scaleY(1) scaleX(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(-50%) scaleY(0.95) scaleX(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(-50%) scaleY(1.05) scaleX(0.95);
+                opacity: 1;
+            }
+        }
+
+        /* Ukrywanie elementów wewnętrznych przed otwarciem */
+        .card-inside .content-reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out 0.7s, transform 0.5s ease-out 0.7s; /* Opóźnienie animacji */
+        }
+
+        .card-container.open .card-inside .content-reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Dodatkowe style dla małych ekranów */
+        @media (max-width: 400px) {
+            .card-container {
+                width: 90vw; /* Szerokość na całą szerokość widoku minus marginesy */
+                height: 60vh; /* Wysokość dostosowana do widoku */
+            }
+            .card-front h2 { font-size: 2rem; }
+            .card-front p { font-size: 0.9rem; }
+            .card-inside h1 { font-size: 1.5rem; }
+            .card-inside .name { font-size: 2.2rem; }
+            .candles-container { height: 70px; margin-bottom: 0.5rem;}
+            .candle { width: 10px; height: 40px; margin: 0 3px;}
+            .candle:nth-child(2n) { height: 35px; }
+            .candle:nth-child(3n) { height: 45px; }
+            .candle:nth-child(4n) { height: 30px; }
+            .flame { width: 8px; height: 15px; top: -12px;}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="perspective-container">
+        <div class="card-container" id="birthdayCard">
+            <div class="card-face card-front">
+                <h2 class="drop-shadow-lg">Dla Wojtka!</h2>
+                <img src="https://placehold.co/100x100/FFFFFF/E91E63?text=Prezent&font=Pacifico" alt="Ikona prezentu" class="w-20 h-20 mb-4 rounded-full shadow-lg">
+                <p class="font-semibold">Kliknij, aby otworzyć niespodziankę!</p>
+                <p class="text-xs mt-2">(Najlepiej oglądać na komputerze)</p>
+            </div>
+
+            <div class="card-face card-inside">
+                <div class="content-reveal w-full">
+                    <div class="candles-container">
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                        <div class="candle"><div class="flame"></div></div>
+                    </div>
+                    <h1>Wszystkiego Najlepszego</h1>
+                    <p class="name">Wojtek!</p>
+                    <p class="text-sm text-gray-600 mt-4 px-2">Życzymy Ci mnóstwo radości, uśmiechu i spełnienia marzeń w dniu Twoich urodzin!</p>
+                    <img src="https://placehold.co/80x80/FFFFFF/FF6F61?text=Tort&font=Pacifico" alt="Ikona tortu" class="w-16 h-16 mt-3 mx-auto rounded-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pobranie elementu kartki
+        const card = document.getElementById('birthdayCard');
+        // Zmienna śledząca, czy dźwięk został już odtworzony
+        let soundPlayed = false;
+
+        // Funkcja do odtwarzania dźwięku (jeśli jest dostępny i dozwolony przez przeglądarkę)
+        function playBirthdaySound() {
+            // Sprawdzenie, czy dźwięk nie został jeszcze odtworzony
+            if (!soundPlayed) {
+                try {
+                    // Utworzenie kontekstu audio
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Utworzenie oscylatora (źródła dźwięku)
+                    const oscillator = audioContext.createOscillator();
+                    // Utworzenie wzmocnienia (głośności)
+                    const gainNode = audioContext.createGain();
+
+                    // Połączenie oscylatora z wzmocnieniem i wzmocnienia z wyjściem audio
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    // Ustawienie typu fali (np. 'sine', 'square', 'sawtooth', 'triangle')
+                    oscillator.type = 'sine';
+                    
+                    // Ustawienie głośności (0.0 - 1.0)
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Cichy dźwięk
+
+                    // Sekwencja nut dla "Happy Birthday" (bardzo uproszczona)
+                    // C4, C4, D4, C4, F4, E4
+                    const notes = [
+                        { freq: 261.63, duration: 0.3 }, { freq: 261.63, duration: 0.3 }, // Ha-ppy
+                        { freq: 293.66, duration: 0.4 }, // Birth-
+                        { freq: 261.63, duration: 0.4 }, // day
+                        { freq: 349.23, duration: 0.4 }, // to
+                        { freq: 329.63, duration: 0.6 }  // you
+                    ];
+
+                    let currentTime = audioContext.currentTime;
+                    // Pętla przez nuty
+                    notes.forEach(note => {
+                        // Ustawienie częstotliwości dla każdej nuty
+                        oscillator.frequency.setValueAtTime(note.freq, currentTime);
+                        // Ustawienie czasu trwania nuty
+                        currentTime += note.duration;
+                    });
+
+                    // Rozpoczęcie odtwarzania dźwięku
+                    oscillator.start();
+                    // Zakończenie odtwarzania dźwięku po określonym czasie
+                    oscillator.stop(currentTime + 0.2);
+                    
+                    // Ustawienie flagi, że dźwięk został odtworzony
+                    soundPlayed = true;
+                } catch (e) {
+                    // Logowanie błędu, jeśli odtwarzanie dźwięku się nie powiedzie
+                    console.error("Nie można odtworzyć dźwięku:", e);
+                }
+            }
+        }
+
+        // Dodanie nasłuchiwania na kliknięcie kartki
+        card.addEventListener('click', () => {
+            // Dodanie/usunięcie klasy 'open' do kontenera kartki
+            card.classList.toggle('open');
+            // Jeśli kartka jest otwierana, spróbuj odtworzyć dźwięk
+            if (card.classList.contains('open')) {
+                playBirthdaySound();
+            }
+        });
+    </script>
+</body>
+</html>
